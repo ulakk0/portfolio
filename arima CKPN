@@ -1,5 +1,5 @@
 
-
+## Install and load package
 install.packages("openxlsx")
 install.packages("TSA")
 install.packages("forecast")
