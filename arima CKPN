@@ -1,0 +1,14 @@
+
+
+install.packages("openxlsx")
+install.packages("TSA")
+install.packages("forecast")
+install.packages("tseries")
+install.packages("readxl")
+install.packages("ggplot2")
+library(openxlsx)
+library(TSA)
+library(forecast)
+library(tseries)
+library(readxl)
+library(ggplot2)
