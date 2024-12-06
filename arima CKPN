@@ -1,5 +1,4 @@
-
-## Install and load package
+	1. Install and Load Package
 install.packages("openxlsx")
 install.packages("TSA")
 install.packages("forecast")
@@ -12,3 +11,154 @@ library(forecast)
 library(tseries)
 library(readxl)
 library(ggplot2)
+
+
+
+	2. Load data menggunakan import dataset
+data <- ckpn
+df <- data.frame(month = as.Date(data$month), 
+                 ckpn  = data$ckpn)
+head(df)
+
+
+
+	3. PLot Data
+p <- ggplot(df,aes(x=month, y=ckpn))+
+  geom_line(color="black",size=1)+
+  theme_minimal()+
+  labs(x="Month", y="CKPN",
+       title="Monthly CKPN")+
+  theme(plot.title=element_text(hjust=0.5, size=15, face="bold"))
+p + scale_x_date(date_labels="%b %Y")+
+  theme(axis.text.x=element_text(angle=50,hjust=1))
+
+
+
+	4. Cek stasionaritas 
+adf.test(data$ckpn)
+plot.ts(data$ckpn, xlab="Month", ylab="ckpn",
+        main="ckpn0")
+
+
+
+	5. Differencing pertama
+df1=diff(data$ckpn)
+adf.test(df1)
+plot.ts(df1, xlab="month", ylab="ckpn",
+        main="First Differencing CKPN")
+	5.1. PACF & ACF (nilai p dan q untuk d=1)
+pacf(df1,5)
+acf(df1,5) 
+
+
+
+	6. Differencing kedua
+df2=diff(df1)
+adf.test(df2)
+plot.ts(df2, xlab="Week", ylab="Price",
+        main="Second Differencing CKPN")
+	6.1. PACF dan ACF (nilai p dan q untuk d=2)
+pacf(df2,5) 
+acf(df2,5) 
+
+
+
+	7. Model ARIMA
+model1 = Arima(data$ckpn,order=c(1,2,1))
+model2 = Arima(data$ckpn,order=c(4,2,1))
+model3 = Arima(data$ckpn,order=c(1,2,4))
+model4 = Arima(data$ckpn,order=c(4,2,4)) 			
+summary(model1)
+summary(model2)
+summary(model3)
+summary(model4)
+
+
+
+	8. Analisis residual 
+	8.1 Normalitas residual
+	    Resiudal terdistribusi secara normal
+shapiro.test(residuals(model1))
+shapiro.test(residuals(model2))
+shapiro.test(residuals(model3))
+shapiro.test(residuals(model4))
+	8.2 Autokorelasi residual
+	    Residual harus bebas dari pola autokorelasi
+Box.test(residuals(model1), type = "Ljung-Box")
+Box.test(residuals(model2), type = "Ljung-Box")
+Box.test(residuals(model3), type = "Ljung-Box")
+Box.test(residuals(model4), type = "Ljung-Box")
+
+
+
+	9. Forecasting 
+	9.1 Model 1
+frc=stats::arima(data$ckpn, order=c(1,2,1))
+fcast=forecast(frc, h=12, level= c(95))
+plot(fcast)
+fcast
+model1 <- Arima(data$ckpn, order = c(1,2,1))
+predicted <- fitted(model1)
+plot(df$month, df$ckpn, type = "l", col = "blue", lwd = 2, 
+     main = "Actual vs Predicted Model 1 (4.32% MAPE)", 
+     xlab = " ", ylab = " ", xaxt = "n", las = 1) # 
+lines(df$month, predicted, col = "red", lwd = 2)
+axis(1, at = df$month, labels = format(df$month, "%b-%Y"), las = 2, cex.axis = 0.8)
+grid(nx = NA, ny = NULL, col = "gray", lty = "dotted", lwd = 0.8)
+legend("topleft", legend = c("Actual", "Predicted"), 
+       col = c("blue", "red"), lwd = 2, bty = "n", cex = 0.8)
+
+	9.2 Model 2
+frc=stats::arima(data$ckpn, order=c(4,2,1))  
+fcast=forecast(frc, h=12, level= c(95))
+plot(fcast)
+fcast
+model2 <- Arima(data$ckpn, order = c(4,2,1))
+predicted <- fitted(model2)
+plot(df$month, df$ckpn, type = "l", col = "blue", lwd = 2, 
+     main = "Actual vs Predicted Model 2 (3.75% MAPE)", 
+     xlab = " ", ylab = " ", xaxt = "n", las = 1) # 
+lines(df$month, predicted, col = "red", lwd = 2)
+axis(1, at = df$month, labels = format(df$month, "%b-%Y"), las = 2, cex.axis = 0.8)
+grid(nx = NA, ny = NULL, col = "gray", lty = "dotted", lwd = 0.8)
+legend("topleft", legend = c("Actual", "Predicted"), 
+       col = c("blue", "red"), lwd = 2, bty = "n", cex = 0.8)
+
+	9.3 Model 3
+frc=stats::arima(data$ckpn, order=c(1,2,4)) #model 3
+fcast=forecast(frc, h=12, level= c(95))
+plot(fcast)
+fcast
+model3 <- Arima(data$ckpn, order = c(1,2,4))
+predicted <- fitted(model3)
+plot(df$month, df$ckpn, type = "l", col = "blue", lwd = 2, 
+     main = "Actual vs Predicted Model 3 (3.43%)", 
+     xlab = " ", ylab = " ", xaxt = "n", las = 1) # 
+lines(df$month, predicted, col = "red", lwd = 2)
+axis(1, at = df$month, labels = format(df$month, "%b-%Y"), las = 2, cex.axis = 0.8)
+grid(nx = NA, ny = NULL, col = "gray", lty = "dotted", lwd = 0.8)
+legend("topleft", legend = c("Actual", "Predicted"), 
+       col = c("blue", "red"), lwd = 2, bty = "n", cex = 0.8)
+
+	9.4 Model 4
+frc=stats::arima(data$ckpn, order=c(4,2,4)) #model 4
+fcast=forecast(frc, h=12, level= c(95))
+plot(fcast)
+fcast
+model4 <- Arima(data$ckpn, order = c(4,2,4))
+predicted <- fitted(model4)
+plot(df$month, df$ckpn, type = "l", col = "blue", lwd = 2, 
+     main = "Actual vs Predicted Model 4 (3.34%)", 
+     xlab = " ", ylab = " ", xaxt = "n", las = 1) # 
+lines(df$month, predicted, col = "red", lwd = 2)
+axis(1, at = df$month, labels = format(df$month, "%b-%Y"), las = 2, cex.axis = 0.8)
+grid(nx = NA, ny = NULL, col = "gray", lty = "dotted", lwd = 0.8)
+legend("topleft", legend = c("Actual", "Predicted"), 
+       col = c("blue", "red"), lwd = 2, bty = "n", cex = 0.8)
+
+
+
+
+
+
+
