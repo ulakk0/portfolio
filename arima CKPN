@@ -46,7 +46,7 @@ df1=diff(data$ckpn)
 adf.test(df1)
 plot.ts(df1, xlab="month", ylab="ckpn",
         main="First Differencing CKPN")
-	5.1. PACF & ACF (nilai p dan q untuk d=1)
+	#5.1. PACF & ACF (nilai p dan q untuk d=1)
 pacf(df1,5)
 acf(df1,5) 
 
@@ -57,7 +57,7 @@ df2=diff(df1)
 adf.test(df2)
 plot.ts(df2, xlab="Week", ylab="Price",
         main="Second Differencing CKPN")
-	6.1. PACF dan ACF (nilai p dan q untuk d=2)
+	#6.1. PACF dan ACF (nilai p dan q untuk d=2)
 pacf(df2,5) 
 acf(df2,5) 
 
