@@ -1,4 +1,4 @@
-	1. Install and Load Package
+	#1. Install and Load Package
 install.packages("openxlsx")
 install.packages("TSA")
 install.packages("forecast")
@@ -14,7 +14,7 @@ library(ggplot2)
 
 
 
-	2. Load data menggunakan import dataset
+	#2. Load data menggunakan import dataset
 data <- ckpn
 df <- data.frame(month = as.Date(data$month), 
                  ckpn  = data$ckpn)
@@ -22,7 +22,7 @@ head(df)
 
 
 
-	3. PLot Data
+	#3. PLot Data
 p <- ggplot(df,aes(x=month, y=ckpn))+
   geom_line(color="black",size=1)+
   theme_minimal()+
@@ -34,14 +34,14 @@ p + scale_x_date(date_labels="%b %Y")+
 
 
 
-	4. Cek stasionaritas 
+	#4. Cek stasionaritas 
 adf.test(data$ckpn)
 plot.ts(data$ckpn, xlab="Month", ylab="ckpn",
         main="ckpn0")
 
 
 
-	5. Differencing pertama
+	#5. Differencing pertama
 df1=diff(data$ckpn)
 adf.test(df1)
 plot.ts(df1, xlab="month", ylab="ckpn",
@@ -52,7 +52,7 @@ acf(df1,5)
 
 
 
-	6. Differencing kedua
+	#6. Differencing kedua
 df2=diff(df1)
 adf.test(df2)
 plot.ts(df2, xlab="Week", ylab="Price",
@@ -63,7 +63,7 @@ acf(df2,5)
 
 
 
-	7. Model ARIMA
+	#7. Model ARIMA
 model1 = Arima(data$ckpn,order=c(1,2,1))
 model2 = Arima(data$ckpn,order=c(4,2,1))
 model3 = Arima(data$ckpn,order=c(1,2,4))
@@ -75,14 +75,14 @@ summary(model4)
 
 
 
-	8. Analisis residual 
-	8.1 Normalitas residual
+	#8. Analisis residual 
+	#8.1 Normalitas residual
 	    Resiudal terdistribusi secara normal
 shapiro.test(residuals(model1))
 shapiro.test(residuals(model2))
 shapiro.test(residuals(model3))
 shapiro.test(residuals(model4))
-	8.2 Autokorelasi residual
+	#8.2 Autokorelasi residual
 	    Residual harus bebas dari pola autokorelasi
 Box.test(residuals(model1), type = "Ljung-Box")
 Box.test(residuals(model2), type = "Ljung-Box")
@@ -91,8 +91,8 @@ Box.test(residuals(model4), type = "Ljung-Box")
 
 
 
-	9. Forecasting 
-	9.1 Model 1
+	#9. Forecasting 
+	#9.1 Model 1
 frc=stats::arima(data$ckpn, order=c(1,2,1))
 fcast=forecast(frc, h=12, level= c(95))
 plot(fcast)
@@ -108,7 +108,7 @@ grid(nx = NA, ny = NULL, col = "gray", lty = "dotted", lwd = 0.8)
 legend("topleft", legend = c("Actual", "Predicted"), 
        col = c("blue", "red"), lwd = 2, bty = "n", cex = 0.8)
 
-	9.2 Model 2
+	#9.2 Model 2
 frc=stats::arima(data$ckpn, order=c(4,2,1))  
 fcast=forecast(frc, h=12, level= c(95))
 plot(fcast)
@@ -124,7 +124,7 @@ grid(nx = NA, ny = NULL, col = "gray", lty = "dotted", lwd = 0.8)
 legend("topleft", legend = c("Actual", "Predicted"), 
        col = c("blue", "red"), lwd = 2, bty = "n", cex = 0.8)
 
-	9.3 Model 3
+	#9.3 Model 3
 frc=stats::arima(data$ckpn, order=c(1,2,4)) #model 3
 fcast=forecast(frc, h=12, level= c(95))
 plot(fcast)
@@ -140,7 +140,7 @@ grid(nx = NA, ny = NULL, col = "gray", lty = "dotted", lwd = 0.8)
 legend("topleft", legend = c("Actual", "Predicted"), 
        col = c("blue", "red"), lwd = 2, bty = "n", cex = 0.8)
 
-	9.4 Model 4
+	#9.4 Model 4
 frc=stats::arima(data$ckpn, order=c(4,2,4)) #model 4
 fcast=forecast(frc, h=12, level= c(95))
 plot(fcast)
